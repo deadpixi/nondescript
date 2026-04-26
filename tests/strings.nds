@@ -1,0 +1,76 @@
+-- strings.nds — String operations and chunks.
+
+import "prelude.nds"
+
+-- Length
+assert length of "hello" = 5
+assert length of "" = 0
+
+-- Character chunks
+assert character 1 of "hello" = "h"
+assert character 5 of "hello" = "o"
+assert last character of "hello" = "o"
+assert first character of "hello" = "h"
+
+-- Character range
+assert character 2 to 4 of "hello" = "ell"
+assert character 1 to 1 of "hello" = "h"
+
+-- Every character
+set chars to every character of "abc"
+assert length of chars = 3
+assert item 1 of chars = "a"
+assert item 2 of chars = "b"
+assert item 3 of chars = "c"
+
+-- Contains
+assert "hello world" contains "world"
+assert "hello world" contains "hello"
+assert not ("hello" contains "xyz")
+assert "hello" contains ""
+
+-- String comparison
+assert "abc" < "abd"
+assert "abd" > "abc"
+assert "abc" = "abc"
+
+-- Case conversion
+assert uppercase("hello") = "HELLO"
+assert lowercase("HELLO") = "hello"
+
+-- Trim
+assert trim("  hello  ") = "hello"
+assert trim("hello") = "hello"
+
+-- StartsWith / endsWith
+assert startsWith("hello", "hel")
+assert not startsWith("hello", "elo")
+assert endsWith("hello", "llo")
+assert not endsWith("hello", "hel")
+
+-- Split and join
+set parts to split("a,b,c", ",")
+assert length of parts = 3
+assert item 1 of parts = "a"
+assert item 2 of parts = "b"
+assert item 3 of parts = "c"
+assert join(parts, "-") = "a-b-c"
+
+-- Replace
+assert replace("hello world", "world", "there") = "hello there"
+assert replaceAll("aaa", "a", "bb") = "bbbbbb"
+
+-- String repetition
+assert "ab" * 3 = "ababab"
+assert "x" * 0 = ""
+
+-- Concatenation with non-strings
+assert "value: " & 42 = "value: 42"
+assert "flag: " & true = "flag: true"
+
+-- Searches.
+assert offset "foo" in "barfoo" = 4
+assert offset "bar" in "barfoo" = 1
+assert offset "" in "barfoo" = 0
+assert offset "llama" in "barfoo" = 0
+assert offset "barfoobarfoo" in "barfoo" = 0

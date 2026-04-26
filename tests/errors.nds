@@ -1,0 +1,79 @@
+-- errors.nds — Error handling with on-error, raise, bubbling.
+
+import "prelude.nds"
+
+-- Basic error handling
+function divSafe(a, b)
+    return a / b
+on error e
+    return "error"
+end function
+
+assert divSafe(10, 2) = 5
+assert divSafe(10, 0) = "error"
+
+-- Error properties
+function getError()
+    my x is 1 / 0
+on error err
+    return err
+end function
+
+set theError to getError()
+assert type of theError = "error"
+assert message of theError = "division by zero"
+
+-- Raise
+function raiseTest()
+    raise nothing message "custom error"
+on error e
+    return message of e
+end function
+
+assert raiseTest() = "custom error"
+
+-- Error bubbling
+function inner()
+    my x is 1 / 0
+end function
+
+function outer()
+    inner()
+on error e
+    return "caught: " & message of e
+end function
+
+assert outer() = "caught: division by zero"
+
+-- No handler — error propagates
+expectError() given ()
+    my x is 1 / 0
+end given
+
+-- Handler only runs once (no re-entry)
+function handlerError()
+    my x is 1 / 0
+on error e
+    return "handled"
+end function
+
+assert handlerError() = "handled"
+
+-- Type errors
+expectError() given ()
+    my x is "hello" + 1
+end given
+
+-- Index errors
+expectError() given ()
+    my x is item 99 of [1, 2, 3]
+end given
+
+-- Stack overflow
+function infinite()
+    return infinite()
+end function
+
+expectError() given ()
+    infinite()
+end given

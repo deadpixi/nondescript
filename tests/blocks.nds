@@ -1,0 +1,176 @@
+-- blocks.nds — Given blocks and closure behavior.
+
+import "prelude.nds"
+
+-- Basic given block
+function applyBlock(x)
+    return given(x)
+end function
+
+set result to applyBlock(10) given (n)
+    return n * 2
+end given
+assert result = 20
+
+-- Block given test
+function maybeBlock(x)
+    if block given then
+        return given(x)
+    end if
+    return x
+end function
+
+assert maybeBlock(5) = 5
+set result to maybeBlock(5) given (n)
+    return n + 1
+end given
+assert result = 6
+
+-- Block captures outer locals
+function makeAdder(n)
+    return given(n)
+end function
+
+function testClosure()
+    my offset is 100
+    set result to makeAdder(42) given (n)
+        return n + offset
+    end given
+    assert result = 142
+end function
+testClosure()
+
+-- Block with multiple parameters
+function combine(a, b)
+    return given(a, b)
+end function
+
+set result to combine(3, 4) given (x, y)
+    return x * y
+end given
+assert result = 12
+
+-- Higher-order blocks
+function transform(items)
+    my result is []
+    for each item x in items do
+        append given(x) to result
+    end for
+    return result
+end function
+
+set doubled to transform([1, 2, 3]) given (n)
+    return n * 2
+end given
+assert doubled = [2, 4, 6]
+
+-- Filter pattern
+function filter(items)
+    my result is []
+    for each item x in items do
+        if given(x) then
+            append x to result
+        end if
+    end for
+    return result
+end function
+
+set evens to filter([1, 2, 3, 4, 5, 6]) given (n)
+    return n mod 2 = 0
+end given
+assert evens = [2, 4, 6]
+
+-- Nested given blocks
+function outer(x)
+    return given(x)
+end function
+
+function inner(x)
+    return given(x)
+end function
+
+set result to outer(10) given (n)
+    return inner(n) given (m)
+        return m + 5
+    end given
+end given
+assert result = 15
+
+-- Blocks can assign to outer scopes.
+function runBlock()
+    given()
+end function
+
+function functionWithVars(x)
+    my outer is 20
+
+    runBlock() given ()
+        set outer to 30
+    end given
+
+    assert outer = 30
+end function
+functionWithVars(1)
+
+-- Block can assign into a chunk of an enclosing local whose name shadows a
+-- global (don't want shadowing to break things)
+function outerChainTest()
+    my outer is [1, 2, 3]
+    runBlock() given ()
+        set first item of outer to 99
+    end given
+    assert outer = [99, 2, 3]
+end function
+outerChainTest()
+
+-- Block can call a function held in an enclosing local.
+function double(n)
+    return n * 2
+end function
+
+function callViaOuter()
+    my myFunc is double
+    my result is 0
+    runBlock() given ()
+        set result to myFunc(21)
+    end given
+    assert result = 42
+end function
+callViaOuter()
+
+-- Make sure locals are preserved when calling blocks.
+function blockLocalRestoreTest()
+    my preserved is 42
+    runBlock() given ()
+        my shadow is 1
+    end given
+    assert preserved = 42
+end function
+blockLocalRestoreTest()
+
+-- A function call with an attached given block, nested inside the predicate
+-- of a list comprehension (which uses anonymous variables).
+function isEven(n)
+    return given(n)
+end function
+
+set evens to every item of [1, 2, 3, 4, 5, 6] where isEven(it) given (x)
+    return x mod 2 = 0
+end given
+assert evens = [2, 4, 6]
+
+-- Anonymous loop with a block accessing it.
+function anonymousBlockWithLoop()
+    my preserved is 42
+    my result is nothing
+
+    set result to every item of [1, 2, 3, 4, 5, 6] where given (it)
+
+    assert preserved = 42
+    assert result = [6]
+end function
+
+anonymousBlockWithLoop() given (x)
+    return x = 6
+end given
+

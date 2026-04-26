@@ -1,0 +1,53 @@
+-- calc.nds — A small calculator library for the calc example.
+
+function factorial(n)
+    if n <= 1 then
+        return 1
+    end if
+    return n * factorial(n - 1)
+end function
+
+function fibonacci(n)
+    my a is 0
+    my b is 1
+    my tmp is 0
+    if n <= 1 then
+        return n
+    end if
+    for i from 2 to n do
+        set tmp to a + b
+        set a to b
+        set b to tmp
+    end for
+    return b
+end function
+
+function isPrime(n)
+    my i is 2
+    if n < 2 then
+        return false
+    end if
+    while i * i <= n do
+        if n mod i = 0 then
+            return false
+        end if
+        increment i
+    end while
+    return true
+end function
+
+function describe(n)
+    my parts is []
+    if isPrime(n) then
+        append "prime" to parts
+    end if
+    if n mod 2 = 0 then
+        append "even" to parts
+    else
+        append "odd" to parts
+    end if
+    if length of parts > 0 then
+        return n as string & " is " & join(parts, " and ")
+    end if
+    return n as string
+end function

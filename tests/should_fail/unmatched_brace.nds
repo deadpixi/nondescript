@@ -1,0 +1,2 @@
+-- Missing closing brace in map literal.
+set x to {1: "a", 2: "b"

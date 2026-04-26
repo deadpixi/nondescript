@@ -1,0 +1,121 @@
+import "prelude.nds"
+
+-- Keywords
+SET x TO 42
+assert x = 42
+set x to 0
+IF TRUE THEN
+    set x to 1
+END IF
+assert x = 1
+
+-- Variables are case-insensitive
+set myVar to 100
+assert MYVAR = 100
+assert myvar = 100
+assert MyVar = 100
+set MYVAR to 200
+assert myVar = 200
+
+-- Functions are case-insensitive
+function sayHello()
+    return "hello"
+end function
+
+assert sayHello() = "hello"
+assert SAYHELLO() = "hello"
+assert sayhello() = "hello"
+
+-- Built-in functions
+assert UPPERCASE("hello") = "HELLO"
+assert Uppercase("hello") = "HELLO"
+assert LENGTH OF "hello" = 5
+assert Length Of "hello" = 5
+
+-- Host commands
+ASSERT true
+Assert true
+FORCE GARBAGE COLLECTION
+Force Garbage Collection
+
+-- Host functions
+assert HOSTADD(1, 2) = 3
+assert HostAdd(1, 2) = 3
+assert hostadd(1, 2) = 3
+
+-- Property names are case-insensitive
+set p to point(3, 4)
+assert X OF p = 3
+assert x of p = 3
+assert Y OF p = 4
+
+-- Type names
+assert TYPE OF 42 = "number"
+assert Type Of 42 = "number"
+
+-- Chunk keywords
+assert ITEM 1 OF [10, 20] = 10
+assert Item 1 Of [10, 20] = 10
+assert FIRST ITEM OF [10, 20] = 10
+assert LAST ITEM OF [10, 20] = 20
+assert CHARACTER 1 OF "hello" = "h"
+assert Character 1 Of "hello" = "h"
+
+-- Constants are case-insensitive
+assert pi = PI
+assert Pi = PI
+assert e = E
+
+-- Control flow keywords
+FOR I FROM 1 TO 3 DO
+    assert i >= 1
+    assert i <= 3
+END FOR
+
+set result to []
+FOR EACH ITEM X IN [1, 2, 3] DO
+    APPEND x TO result
+END FOR
+assert result = [1, 2, 3]
+
+WHILE false DO
+    assert false
+END WHILE
+
+-- Boolean literals
+assert TRUE = true
+assert True = true
+assert FALSE = false
+assert False = false
+assert NOT false
+assert Not False
+
+-- Nothing
+assert NOTHING = nothing
+assert Nothing = nothing
+
+-- Strings are STILL case-sensitive
+assert not ("Hello" = "hello")
+assert not ("ABC" = "abc")
+set m to {"Foo": 1, "foo": 2}
+assert item "Foo" of m = 1
+assert item "foo" of m = 2
+assert length of m = 2
+
+-- Given blocks
+function apply(x)
+    return GIVEN(x)
+end function
+
+set result to apply(5) GIVEN (n)
+    RETURN n * 2
+END GIVEN
+assert result = 10
+
+-- Error handling keywords
+function errorTest()
+    my x is 1 / 0
+ON ERROR err
+    RETURN "caught"
+END FUNCTION
+assert errorTest() = "caught"

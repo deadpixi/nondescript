@@ -1,0 +1,2 @@
+-- `exit` is not allowed at top level.
+exit while

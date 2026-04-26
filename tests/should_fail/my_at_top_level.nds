@@ -1,0 +1,2 @@
+-- `my` is not allowed at top level.
+my x is 5

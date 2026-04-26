@@ -1,0 +1,72 @@
+-- lists.nds — List operations and chunks.
+
+import "prelude.nds"
+
+-- Literals and length
+set xs to [1, 2, 3]
+assert length of xs = 3
+
+-- Item access
+assert item 1 of xs = 1
+assert item 3 of xs = 3
+assert first item of xs = 1
+assert last item of xs = 3
+
+-- Negative indexing
+assert item -1 of xs = 3
+assert item -2 of xs = 2
+
+-- Item range
+set sub to item 1 to 2 of xs
+assert length of sub = 2
+assert item 1 of sub = 1
+assert item 2 of sub = 2
+
+-- Every item
+set all to every item of [10, 20, 30]
+assert length of all = 3
+assert item 2 of all = 20
+
+-- Append
+set xs to [1, 2]
+append 3 to xs
+assert length of xs = 3
+assert item 3 of xs = 3
+
+-- Set item
+set xs to [10, 20, 30]
+set item 2 of xs to 99
+assert item 2 of xs = 99
+
+-- Delete item
+set xs to [10, 20, 30]
+delete item 2 of xs
+assert length of xs = 2
+assert item 1 of xs = 10
+assert item 2 of xs = 30
+
+-- Equality
+assert [1, 2, 3] = [1, 2, 3]
+assert not ([1, 2] = [1, 2, 3])
+assert not ([1, 2, 3] = [1, 2, 4])
+
+-- Contains
+assert [1, 2, 3] contains 2
+assert not ([1, 2, 3] contains 4)
+assert ["a", "b"] contains "b"
+
+-- Nested lists
+set nested to [[1, 2], [3, 4]]
+assert item 1 of item 2 of nested = 3
+
+-- Empty list
+assert length of [] = 0
+assert not ([] contains 1)
+assert [] = []
+
+-- Sort
+set xs to [3, 1, 2]
+assert sort(xs) = [1, 2, 3]
+
+-- Reverse
+assert reverse([1, 2, 3]) = [3, 2, 1]

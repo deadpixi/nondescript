@@ -1,0 +1,2 @@
+-- Unknown type name in `as` cast.
+set x to 1 as wibblewop

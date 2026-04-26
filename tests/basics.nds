@@ -1,0 +1,56 @@
+-- basics.nds — Variables, arithmetic, assignment, basic expressions.
+
+import "prelude.nds"
+
+-- Variable assignment
+set x to 42
+assert x = 42
+
+-- Arithmetic
+assert 2 + 3 = 5
+assert 10 - 7 = 3
+assert 4 * 5 = 20
+assert 10 / 4 = 2.5
+assert 10 div 3 = 3
+assert 10 mod 3 = 1
+assert -5 + 5 = 0
+
+-- Order of operations
+assert 2 + 3 * 4 = 14
+assert (2 + 3) * 4 = 20
+
+-- Boolean logic
+assert true
+assert not false
+assert true and true
+assert not (true and false)
+assert true or false
+assert not (false or false)
+
+-- String concatenation
+assert "hello" & " " & "world" = "hello world"
+
+-- Nothing
+assert nothing = nothing
+assert not (nothing = 0)
+assert not (nothing = false)
+assert not (nothing = "")
+
+-- Comparison operators
+assert 1 < 2
+assert 2 > 1
+assert 1 <= 1
+assert 1 <= 2
+assert 2 >= 2
+assert 2 >= 1
+assert not (2 < 1)
+assert not (1 > 2)
+
+-- Increment and decrement
+set counter to 0
+increment counter
+assert counter = 1
+increment counter
+assert counter = 2
+decrement counter
+assert counter = 1

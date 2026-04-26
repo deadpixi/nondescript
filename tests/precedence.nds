@@ -1,0 +1,132 @@
+-- precedence.nds — test operator and grammar precedence
+
+import "prelude.nds"
+
+-- Mul/div vs add/sub
+
+assert 1 + 2 * 3 = 7
+assert 2 * 3 + 1 = 7
+assert 10 - 6 / 2 = 7
+assert 10 - 6 / 2 = 7
+assert 1 + 8 div 3 = 3
+assert 1 + 10 mod 3 = 2
+
+-- Left-associativity at the same level
+assert 10 - 4 - 3 = 3
+assert 8 / 4 / 2 = 1
+assert 2 * 3 * 4 = 24
+
+-- Unary minus vs mul/add
+
+assert -2 * 3 = -6
+assert -2 + 5 = 3
+assert 5 + -2 = 3
+assert -(-5) = 5
+assert -2 * -3 = 6
+
+-- Concat vs add/mul
+
+-- Concat is looser than add: "a" & 1 + 2 should parse as "a" & (1 + 2)
+assert "a" & 1 + 2 = "a3"
+assert 1 + 2 & "a" = "3a"
+assert 2 * 3 & "x" = "6x"
+
+-- Left-assoc concat
+assert "a" & "b" & "c" = "abc"
+
+-- Comparison vs concat / arithmetic
+
+-- Comparison is looser than concat: "a" & "b" = "ab" parses as ("a" & "b") = "ab"
+assert "a" & "b" = "ab"
+assert 1 + 2 = 3
+assert 1 + 2 < 4
+
+-- not / and / or
+
+-- not is tighter than and/or but looser than comparison
+assert not false
+assert not false and true
+assert not (false and true)
+assert not 1 = 2          -- parses as (not 1) = 2 — pin current behavior
+assert not (1 = 2)
+
+-- and tighter than or
+assert true or false and false           -- true or (false and false) = true
+assert not ((true or false) and false)   -- contrast
+
+-- Stackable not
+assert not not true
+assert not not not false
+
+-- Cast — current behavior (cast binds tighter than concat/add)
+
+-- Cast tighter than concat
+assert 1 as string & "x" = "1x"
+assert "x" & 1 as string = "x1"
+
+-- Cast vs comparison (cast tighter)
+assert 1 as string = "1"
+assert "1" = 1 as string
+
+-- Cast chains left-associatively
+assert 1 as string as number = 1
+assert "42" as number as string = "42"
+
+-- Unary minus + cast: literal-sign absorption hack
+
+-- These work today via the parsePrimary `-NUM` shortcut + parseUnary
+-- peek-ahead. After the Pratt rework they will work via
+-- PREC_UNARY > PREC_CAST in the precedence table; the hacks go away.
+assert -1.25 as string = "-1.25"
+assert -42 as string = "-42"
+
+-- Unary on a non-literal: -X currently parses inside parseUnary,
+-- and `as` is *tighter* than unary, so this is `-(x as number)`.
+-- After the rework, semantics are the same: cast still tighter than
+-- unary on non-literals.
+set s to "5"
+assert -s as number = -5
+
+-- Nested chunk access (of-RHS recurses correctly into of-expressions)
+assert item 1 of item 2 of [[1, 2], [3, 4]] = 3
+assert item 2 of item 1 of [[10, 20], [30, 40]] = 20
+
+-- first / last
+assert first item of [10, 20, 30] = 10
+assert last item of [10, 20, 30] = 30
+
+-- Prepositional + unary minus: -(item 1 of …)
+assert -item 1 of [5, 6, 7] = -5
+
+-- length / type as property names (any IDENT-of is property access)
+assert length of [1, 2, 3] = 3
+assert type of 42 = "number"
+assert type of "hi" = "string"
+
+-- Prepositions bind tighter than cast.
+
+assert item 1 of [10, 20, 30] as string = "10"
+assert character 1 of ([10, 20, 30] as string) = "["
+assert length of "abc" as string = "3"
+
+-- Multi-word `is` operators
+
+assert 1 is equal to 1
+assert 2 is greater than 1
+assert 1 is less than 2
+assert 2 is greater than or equal to 2
+assert 1 is less than or equal to 1
+assert 1 is not 2
+assert 1 is not equal to 2
+
+-- contains
+
+assert "hello" contains "ell"
+assert [1, 2, 3] contains 2
+assert not ("abc" contains "z")
+
+-- Parens force the loose case
+
+assert (1 + 2) * 3 = 9
+assert (1 + 2) as string = "3"
+assert (true or false) and false = false

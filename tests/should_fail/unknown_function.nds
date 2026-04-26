@@ -1,0 +1,2 @@
+-- Calling an undefined function should error at compile time.
+set x to nonexistentFunction(42)

@@ -1,0 +1,5 @@
+-- Final statement (return/raise/exit/next) must be last in its block.
+function f()
+    return 1
+    set x to 2
+end function

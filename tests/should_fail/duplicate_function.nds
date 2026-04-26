@@ -1,0 +1,8 @@
+-- Duplicate function definitions
+function foo()
+	-- does nothing
+end function
+
+function foo()
+	-- also does nothing
+end function

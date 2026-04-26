@@ -1,0 +1,68 @@
+-- gc_stress.nds — GC stress test: allocate heavily, force collection, verify integrity.
+
+import "prelude.nds"
+
+-- Build a large list of strings, forcing many allocations
+set big to []
+for i from 1 to 500 do
+    append "item-" & i as string to big
+end for
+assert length of big = 500
+assert item 1 of big = "item-1"
+assert item 500 of big = "item-500"
+
+-- Force GC mid-construction
+set result to []
+for i from 1 to 100 do
+    append [i, i * 2, "str-" & i as string] to result
+    if i mod 25 = 0 then
+        force garbage collection
+    end if
+end for
+assert length of result = 100
+assert item 1 of item 50 of result = 50
+assert item 3 of item 50 of result = "str-50"
+
+-- Map stress
+set m to {}
+for i from 1 to 200 do
+    set item (i as string) of m to i * i
+end for
+force garbage collection
+assert length of m = 200
+assert item "1" of m = 1
+assert item "100" of m = 10000
+assert item "200" of m = 40000
+
+-- String concatenation stress (lots of temporaries)
+set s to ""
+for i from 1 to 100 do
+    set s to s & "x"
+end for
+force garbage collection
+assert length of s = 100
+
+-- Nested structure survives GC
+set tree to {"left": {"value": 1}, "right": {"value": 2}}
+force garbage collection
+assert item "value" of item "left" of tree = 1
+assert item "value" of item "right" of tree = 2
+
+-- Replace the root, old tree should be collectible
+set tree to nothing
+force garbage collection
+assert tree = nothing
+
+-- Recursive structures and stringification.
+set listA to [1, 2, 3]
+set listB to [1, 2, listA]
+set item 1 of listA to listB
+force garbage collection
+set recursiveString to listA as string
+
+set map1 to {}
+set key "foo" of map1 to map1
+set recursiveMapString to map1 as string
+force garbage collection
+set recursiveMapString to nothing
+force garbage collection

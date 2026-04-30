@@ -1,0 +1,78 @@
+-- maps.nds — Map operations.
+
+import "prelude.nds"
+
+-- Literal and access
+set m to {"name": "Alice", "age": 30}
+assert item "name" of m = "Alice"
+assert item "age" of m = 30
+assert length of m = 2
+
+-- Set item
+set item "city" of m to "NYC"
+assert item "city" of m = "NYC"
+assert length of m = 3
+
+-- Update item
+set item "age" of m to 31
+assert item "age" of m = 31
+assert length of m = 3
+
+-- Delete item
+delete item "city" of m
+assert length of m = 2
+
+-- Contains (checks keys)
+assert m contains "name"
+assert not (m contains "city")
+
+-- Equality
+assert {"a": 1} = {"a": 1}
+assert not ({"a": 1} = {"a": 2})
+assert not ({"a": 1} = {"b": 1})
+
+-- Numeric keys
+set m to {1: "one", 2: "two"}
+assert item 1 of m = "one"
+assert item 2 of m = "two"
+
+-- Empty map
+assert length of {} = 0
+assert {} = {}
+assert not ({} contains "x")
+
+-- Mixed key types
+set m to {"a": 1, 1: "a", true: "t", false: "f"}
+assert item "a" of m = 1
+assert item 1 of m = "a"
+assert length of m = 4
+assert item true of m = "t"
+assert item false of m is equal to "f"
+
+-- Keys/values/entries of map
+set keys to every key of {"foo": 1, "bar": 2, "baz": 3}
+assert keys = ["foo", "bar", "baz"]
+
+set values to every value of {"foo": 1, "bar": 2, "baz": 3}
+assert values = [1, 2, 3]
+
+set entries to every entry of {"foo": 1, "bar": 2, "baz": 3}
+assert key of first item of entries = "foo"
+assert key of item 2 of entries = "bar"
+assert key of last item of entries = "baz"
+assert value of first item of entries = 1
+assert value of item 2 of entries = 2
+assert value of last item of entries = 3
+
+-- Maps are iterated in insertion order
+set m to {"a": 1, "b": 2, "c": 3}
+set keys to every key of m
+assert keys = ["a", "b", "c"]
+delete key "a" of m
+set key "a" of m to 4
+set keys to every key of m
+assert keys = ["b", "c", "a"]
+set key "d" of m to 5
+set keys to every key of m
+assert keys = ["b", "c", "a", "d"]
+

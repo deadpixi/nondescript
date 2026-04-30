@@ -1,0 +1,2 @@
+-- String must terminate before newline.
+set x to "hello world

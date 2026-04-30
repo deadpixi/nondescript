@@ -1,0 +1,8 @@
+-- Shared test functions but really just an execuse to test the import mechanism.
+
+function expectError(pattern)
+    given()
+	raise false message "unexpected error"
+on error e
+    assert message of e contains pattern
+end function

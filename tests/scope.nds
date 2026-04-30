@@ -1,0 +1,61 @@
+-- scope.nds — Lexical scoping, my-declarations, shadowing.
+
+import "prelude.nds"
+
+-- My creates local binding
+function scopeTest()
+    my x is 10
+    if true then
+        my x is 20
+        assert x = 20
+    end if
+    assert x = 10
+end function
+scopeTest()
+
+-- Set modifies innermost binding
+function setTest()
+    my x is 10
+    if true then
+        set x to 20
+    end if
+    assert x = 20
+end function
+setTest()
+
+-- Set with inner my doesn't affect outer
+function shadowTest()
+    my x is 10
+    if true then
+        my x
+        set x to 20
+        assert x = 20
+    end if
+    assert x = 10
+end function
+shadowTest()
+
+-- Global scope
+set globalVar to "global"
+function readGlobal()
+    return globalVar
+end function
+assert readGlobal() = "global"
+
+-- Function can modify globals
+function writeGlobal()
+    set globalVar to "modified"
+end function
+writeGlobal()
+assert globalVar = "modified"
+
+-- Constants
+assert PI > 3.14
+assert PI < 3.15
+assert E > 2.71
+assert E < 2.72
+
+-- NL, TAB, QUOTE
+assert length of NL = 1
+assert length of TAB = 1
+assert length of QUOTE = 1

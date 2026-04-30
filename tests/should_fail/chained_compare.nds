@@ -1,0 +1,2 @@
+-- Comparison operators are non-associative.
+set x to 1 = 2 = 3

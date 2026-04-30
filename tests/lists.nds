@@ -1,0 +1,170 @@
+-- lists.nds — List operations and chunks.
+
+import "prelude.nds"
+
+-- Literals and length
+set xs to [1, 2, 3]
+assert length of xs = 3
+
+-- Item access
+assert item 1 of xs = 1
+assert item 3 of xs = 3
+assert first item of xs = 1
+assert last item of xs = 3
+
+-- Negative indexing
+assert item -1 of xs = 3
+assert item -2 of xs = 2
+assert item -3 of xs = 1
+assert item -1 of [42] = 42
+assert item -1 of [10, 20, 30, 40, 50] = 50
+
+-- Negative index: set
+set ys to [1, 2, 3]
+set item -1 of ys to 99
+assert ys = [1, 2, 99]
+set item -2 of ys to 88
+assert ys = [1, 88, 99]
+
+-- Negative index: delete
+set ys to [1, 2, 3, 4]
+delete item -1 of ys
+assert ys = [1, 2, 3]
+delete item -2 of ys
+assert ys = [1, 3]
+
+-- Negative index: out of range raises
+function negOOB()
+    my x is item -10 of [1, 2, 3]
+    return "no error"
+on error e
+    return "raised"
+end function
+assert negOOB() = "raised"
+
+-- Negative index on empty list raises
+function negEmpty()
+    my x is item -1 of []
+    return "no error"
+on error e
+    return "raised"
+end function
+assert negEmpty() = "raised"
+
+-- Item range
+set sub to item 1 to 2 of xs
+assert length of sub = 2
+assert item 1 of sub = 1
+assert item 2 of sub = 2
+
+-- Negative range bounds
+assert item -2 to -1 of [10, 20, 30, 40, 50] = [40, 50]
+assert item -3 to -1 of [10, 20, 30, 40, 50] = [30, 40, 50]
+assert item 1 to -1 of [10, 20, 30] = [10, 20, 30]
+assert item 2 to -2 of [10, 20, 30, 40, 50] = [20, 30, 40]
+
+-- Single-element range
+assert item 2 to 2 of [10, 20, 30] = [20]
+
+-- Inverted range (end < start) raises (reverse-order behavior reserved for the future)
+function invRange()
+    my x is item 3 to 1 of [10, 20, 30]
+    return "no error"
+on error e
+    return "raised"
+end function
+assert invRange() = "raised"
+
+function invRangeNeg()
+    my x is item -1 to 1 of [10, 20, 30]
+    return "no error"
+on error e
+    return "raised"
+end function
+assert invRangeNeg() = "raised"
+
+-- Range past end raises
+function rangePastEnd()
+    my x is item 1 to 10 of [10, 20, 30]
+    return "no error"
+on error e
+    return "raised"
+end function
+assert rangePastEnd() = "raised"
+
+function rangeBeyond()
+    my x is item 5 to 10 of [10, 20, 30]
+    return "no error"
+on error e
+    return "raised"
+end function
+assert rangeBeyond() = "raised"
+
+-- Index 0 raises (1-based)
+function zeroIndex()
+    my x is item 0 of [10, 20, 30]
+    return "no error"
+on error e
+    return "raised"
+end function
+assert zeroIndex() = "raised"
+
+-- Every item
+set all to every item of [10, 20, 30]
+assert length of all = 3
+assert item 2 of all = 20
+
+-- Append
+set xs to [1, 2]
+append 3 to xs
+assert length of xs = 3
+assert item 3 of xs = 3
+
+-- Set item
+set xs to [10, 20, 30]
+set item 2 of xs to 99
+assert item 2 of xs = 99
+
+-- Delete item
+set xs to [10, 20, 30]
+delete item 2 of xs
+assert length of xs = 2
+assert item 1 of xs = 10
+assert item 2 of xs = 30
+
+-- Equality
+assert [1, 2, 3] = [1, 2, 3]
+assert not ([1, 2] = [1, 2, 3])
+assert not ([1, 2, 3] = [1, 2, 4])
+
+-- Contains
+assert [1, 2, 3] contains 2
+assert not ([1, 2, 3] contains 4)
+assert ["a", "b"] contains "b"
+
+-- Nested lists
+set nested to [[1, 2], [3, 4]]
+assert item 1 of item 2 of nested = 3
+
+-- Empty list
+assert length of [] = 0
+assert not ([] contains 1)
+assert [] = []
+
+-- Sort
+set xs to [3, 1, 2]
+assert sort(xs) = [1, 2, 3]
+
+-- Reverse
+assert reverse([1, 2, 3]) = [3, 2, 1]
+
+-- Nested equality
+set a to []
+set b to []
+set i to 0
+while i < 50 do
+    set a to [a]
+    set b to [b]
+    increment i
+end while
+assert a = b

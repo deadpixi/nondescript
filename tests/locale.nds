@@ -1,0 +1,39 @@
+-- locale.nds — test for issues with parsing doubles based on LC_NUMERIC
+
+import "prelude.nds"
+
+-- Source literals: tokenizer always accepts '.' as the fractional separator.
+assert 3.14 > 3
+assert 3.14 < 3.2
+assert 0.5 + 0.5 = 1
+assert 1.5e3 = 1500
+assert 2.5e-1 = 0.25
+assert -3.14 < 0
+
+-- Arithmetic: rebuilding a literal value from parts.
+assert 3 + 0.14 = 3.14
+assert 1.0 / 4.0 = 0.25
+assert 10.5 - 0.5 = 10
+
+-- Number-to-string always emits '.' as the separator.
+assert 3.14 as string = "3.14"
+assert 0.5 as string = "0.5"
+assert -1.25 as string = "-1.25"
+assert 2.5e-1 as string = "0.25"
+
+-- String-to-number accepts NDS syntax ('.' separator) under any locale.
+assert "3.14" as number = 3.14
+assert "0.5" as number = 0.5
+assert "1.5e3" as number = 1500
+assert "-3.14" as number = -3.14
+
+-- Round trip: number → string → number.
+assert ((3.14 as string) as number) = 3.14
+assert ((0.125 as string) as number) = 0.125
+assert ((1e-10 as string) as number) = 1e-10
+
+-- Integer-valued doubles: Number_toString special-cases these to an integer
+-- format (no decimal separator involved).
+assert 42 as string = "42"
+assert (-7) as string = "-7"
+assert 1000000 as string = "1000000"

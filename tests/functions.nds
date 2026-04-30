@@ -1,0 +1,97 @@
+-- functions.nds — Function declaration, calls, recursion, scope.
+
+import "prelude.nds"
+
+-- Basic function
+function double(x)
+    return x * 2
+end function
+
+assert double(21) = 42
+
+-- Multiple arguments
+function add(a, b)
+    return a + b
+end function
+
+assert add(3, 4) = 7
+
+-- Recursion
+function factorial(n)
+    if n <= 1 then
+        return 1
+    end if
+    return n * factorial(n - 1)
+end function
+
+assert factorial(0) = 1
+assert factorial(1) = 1
+assert factorial(5) = 120
+assert factorial(10) = 3628800
+
+-- Deep recursion errors gracefully.
+expectError("stack overflow") given ()
+	factorial(3628800)
+end given
+
+-- No explicit return gives nothing
+function noReturn()
+    set x to 42
+end function
+
+assert noReturn() = nothing
+
+-- Functions are first-class values
+set f to factorial
+assert f(5) = 120
+
+-- Too few arguments get nothing
+function needsTwo(a, b)
+    return b
+end function
+
+assert needsTwo(1) = nothing
+
+-- Function with local variables
+function localTest()
+    my x is 10
+    my y is 20
+    return x + y
+end function
+
+assert localTest() = 30
+
+-- Functions can be passed blocks even if they don't use them.
+function blockless()
+    return 2 * 2
+end function
+
+set blocklessResult to blockless() given (i)
+    return 4 * 4
+end given
+
+assert blocklessResult = 4
+
+-- Functions can be redefined
+function redefined()
+    return 1
+end function
+
+function redefined()
+    return 2
+end function
+
+assert redefined() = 2
+
+-- Functions can be assigned over each other.
+function overwritten()
+    return 3
+end function
+
+function toOverwrite()
+    return 4
+end function
+
+set overwritten to toOverwrite
+
+assert overwritten() is equal to 4

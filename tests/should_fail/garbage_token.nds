@@ -1,0 +1,2 @@
+-- Invalid character should produce a clean lexer error.
+set x to 1 @ 2

@@ -1,0 +1,46 @@
+-- types.nds — Type checking, equality, casting.
+
+import "prelude.nds"
+
+-- Type names
+assert type of nothing = "nothing"
+assert type of true = "boolean"
+assert type of 42 = "number"
+assert type of "hello" = "string"
+assert type of [] = "list"
+assert type of {} = "map"
+
+-- Cross-type inequality
+assert not (0 = false)
+assert not (1 = true)
+assert not ("" = nothing)
+assert not (0 = "0")
+assert not ([] = nothing)
+
+-- Casting to string
+assert 42 as string = "42"
+assert true as string = "true"
+assert false as string = "false"
+assert nothing as string = "nothing"
+
+-- Casting to number
+assert "42" as number = 42
+assert "3.14" as number = 3.14
+
+-- Casting to boolean
+assert 1 as boolean = true
+assert 0 as boolean = false
+assert "" as boolean = false
+assert "hello" as boolean = true
+assert nothing as boolean = false
+assert [] as boolean = true
+
+-- Bad casts
+expectError("cannot cast") given ()
+    my x is "not a number" as number
+end given
+
+-- Obviously too-big numbers should error.
+expectError("cannot cast") given ()
+    my x is ("1" & "0" * 1000) as number
+end given

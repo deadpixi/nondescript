@@ -1,0 +1,2 @@
+-- Assignment target must end in an identifier, not a literal.
+set 1 to 2

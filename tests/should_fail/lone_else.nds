@@ -1,0 +1,4 @@
+-- `else` with no preceding `if`.
+else
+    set x to 1
+end if

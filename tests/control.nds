@@ -1,0 +1,79 @@
+-- control.nds — Control flow: if, while, for, for-each.
+
+import "prelude.nds"
+
+-- If/else
+set x to 10
+set result to ""
+if x > 5 then
+    set result to "big"
+else
+    set result to "small"
+end if
+assert result = "big"
+
+if x < 5 then
+    set result to "small"
+else
+    set result to "big"
+end if
+assert result = "big"
+
+-- While loop
+set sum to 0
+set i to 1
+while i <= 10 do
+    set sum to sum + i
+    increment i
+end while
+assert sum = 55
+
+-- For loop
+set sum to 0
+for i from 1 to 5 do
+    set sum to sum + i
+end for
+assert sum = 15
+
+-- For loop with step
+set sum to 0
+for i from 0 to 10 by 2 do
+    set sum to sum + i
+end for
+assert sum = 30
+
+-- For-each over list
+set total to 0
+for each item x in [10, 20, 30] do
+    set total to total + x
+end for
+assert total = 60
+
+-- For-each with where clause
+set result to []
+for each item x in [1, 2, 3, 4, 5, 6] where x mod 2 = 0 do
+    append x to result
+end for
+assert result = [2, 4, 6]
+
+-- For-each over characters
+set chars to []
+for each character c in "abc" do
+    append c to chars
+end for
+assert chars = ["a", "b", "c"]
+
+-- Nested loops
+set result to []
+for i from 1 to 3 do
+    for j from 1 to 3 do
+        if i = j then
+            append i to result
+        end if
+    end for
+end for
+assert result = [1, 2, 3]
+
+-- List comprehension style (every ... where)
+set odds to every item of [1, 2, 3, 4, 5] where it mod 2 = 1
+assert odds = [1, 3, 5]

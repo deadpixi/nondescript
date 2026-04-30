@@ -1,0 +1,6 @@
+-- `my` declarations must precede all other statements in a block.
+function f()
+    set x to 1
+    my y is 2
+    return x + y
+end function

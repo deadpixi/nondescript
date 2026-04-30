@@ -1,0 +1,105 @@
+-- errors.nds — Error handling with on-error, raise, bubbling.
+
+import "prelude.nds"
+
+-- Basic error handling
+function divSafe(a, b)
+    return a / b
+on error e
+    return "error"
+end function
+
+assert divSafe(10, 2) = 5
+assert divSafe(10, 0) = "error"
+
+-- Error properties
+function getError()
+    my x is 1 / 0
+on error err
+    return err
+end function
+
+set theError to getError()
+assert type of theError = "error"
+assert message of theError = "division by zero"
+
+-- Raise
+function raiseTest()
+    raise nothing message "custom error"
+on error e
+    return message of e
+end function
+
+assert raiseTest() = "custom error"
+
+-- Error bubbling
+function inner()
+    my x is 1 / 0
+end function
+
+function outer()
+    inner()
+on error e
+    return "caught: " & message of e
+end function
+
+assert outer() = "caught: division by zero"
+
+-- No handler — error propagates
+expectError("division by zero") given ()
+    my x is 1 / 0
+end given
+
+-- Handler only runs once (no re-entry)
+function handlerError()
+    my x is 1 / 0
+on error e
+    return "handled"
+end function
+
+assert handlerError() = "handled"
+
+-- Type errors
+expectError("arithmetic requires numeric operands") given ()
+    my x is "hello" + 1
+end given
+
+-- Index errors
+expectError("index out of range") given ()
+    my x is item 99 of [1, 2, 3]
+end given
+
+-- Stack overflow
+function infinite()
+    return infinite()
+end function
+
+expectError("stack overflow") given ()
+    infinite()
+end given
+
+-- Deep recursive comparison.
+expectError("stack overflow") given ()
+    set a to []
+    set b to []
+    set i to 0
+    while i < 100000 do
+        set a to [a]
+        set b to [b]
+        increment i
+    end while
+    set _ to a = b
+end given
+
+-- Maps too.
+expectError("stack overflow") given ()
+    set a to {}
+    set b to {}
+    set i to 0
+    while i < 100000 do
+        set a to {"x": a}
+        set b to {"x": b}
+        increment i
+    end while
+    set _ to a = b
+end given

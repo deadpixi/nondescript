@@ -1,0 +1,176 @@
+-- host.nds — Host function calling convention and reentry.
+
+import "prelude.nds"
+
+-- Host function basic call
+assert hostAdd(2, 3) = 5
+assert hostAdd(0, 0) = 0
+assert hostAdd(-1, 1) = 0
+assert hostAdd(1000000, 1) = 1000001
+
+-- Callback into NDS from C
+function double(x)
+    return x * 2
+end function
+
+assert callBack("double", 21) = 42
+
+-- Callback with string function
+function greet(name)
+    return "hello " & name
+end function
+
+assert callBack("greet", "world") = "hello world"
+
+-- C calls NDS which uses host functions
+function addTen(x)
+    return hostAdd(x, 10)
+end function
+
+assert callBack("addTen", 5) = 15
+
+-- Callback by value (passing function directly, not by name)
+assert callBackValue(double, 21) = 42
+assert callBackValue(greet, "world") = "hello world"
+assert callBackValue(addTen, 5) = 15
+
+-- Host command with expression and variable slots: swap
+set a to nothing
+set b to nothing
+swap 10 with 20 into a and b
+assert a = 20
+assert b = 10
+
+swap "hello" with "world" into a and b
+assert a = "world"
+assert b = "hello"
+
+-- Swap with compound expressions
+set x to 100
+set y to 200
+swap (x + 1) with (y + 2) into a and b
+assert a = 202
+assert b = 101
+
+-- Unpack one expression, three variable slots, variables autovivified
+unpack [10, 20, 30] into p and q and r
+assert p = 10
+assert q = 20
+assert r = 30
+
+-- Unpack with fewer elements than variables
+unpack [42] into p and q and r
+assert p = 42
+assert q = nothing
+assert r = nothing
+
+-- Unpack with expressions
+unpack split("a-b-c", "-") into p and q and r
+assert p = "a"
+assert q = "b"
+assert r = "c"
+
+-- Custom point type
+set p to point(3, 4)
+assert type of p = "point"
+assert x of p = 3
+assert y of p = 4
+
+-- Point equality
+assert point(1, 2) = point(1, 2)
+assert not (point(1, 2) = point(1, 3))
+
+-- Point toString
+assert p as string = "(3, 4)"
+
+-- Point coordinate chunk
+assert coordinate 1 of p = 3
+assert coordinate 2 of p = 4
+
+-- Coordinate error
+expectError("coordinate index must be 1 or 2") given ()
+    my bad is coordinate 3 of point(1, 2)
+end given
+
+-- Force GC shouldn't break anything
+set big to []
+for i from 1 to 100 do
+    append "item " & i as string to big
+end for
+force garbage collection
+assert length of big = 100
+assert item 1 of big = "item 1"
+assert item 100 of big = "item 100"
+
+-- frob x: doubles x (via reference)
+set x to 5
+frob x
+assert x = 10
+frob x
+assert x = 20
+
+-- clamp REFERENCE between EXPR and EXPR
+-- note that we properly handle `and` here, even though `0 and 10` is a valid expression
+set v to 50
+clamp v between 0 and 10
+assert v = 10
+
+set v to -5
+clamp v between 0 and 10
+assert v = 0
+
+set v to 5
+clamp v between 0 and 10
+assert v = 5
+
+-- check compound expression in expr slot with precedence match
+set v to 50
+set lo to 1
+clamp v between lo - 1 and 10
+assert v = 10
+
+-- Function calls and chunk access in slots
+set bounds to [0, 100]
+set v to 250
+clamp v between item 1 of bounds and item 2 of bounds
+assert v = 100
+
+-- Arithmetic in both slots
+set v to 5
+clamp v between 1 + 2 and 8 - 1
+assert v = 5
+set v to 100
+clamp v between 1 + 2 and 8 - 1
+assert v = 7
+
+-- logical and inside an expression still needs parens (note that this
+-- is a stupid test because clamp doesn't take booleans...)
+set ok to true
+set bad to false
+expectError("clamp requires a number") given ()
+    set v to 5
+    clamp v between (ok and bad) and 10
+end given
+
+-- A possibly misleading parse
+set a to 0
+set b to 5
+set v to 3
+clamp v between a and b and 10
+assert v = 3
+set v to 99
+clamp v between a and b and 10
+assert v = 10
+
+-- Multiple references in one command (swapref)
+set a to "first"
+set b to "second"
+swapref a and b
+assert a = "second"
+assert b = "first"
+
+-- Reference uses the variable's current value: errors if wrong type
+expectError("frob requires a number") given ()
+    set s to "not a number"
+    frob s
+end given

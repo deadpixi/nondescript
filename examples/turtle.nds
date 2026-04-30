@@ -1,0 +1,55 @@
+-- turtle.nds — Draw shapes using turtle graphics commands.
+--
+-- The host provides these commands:
+--   move forward EXPR steps       move the turtle forward by N pixels
+--   move backward EXPR steps      move the turtle backward by N pixels
+--   turn left EXPR degrees        turn left by N degrees
+--   turn right EXPR degrees       turn right by N degrees
+--   pen up                        stop drawing
+--   pen down                      start drawing
+--   change pen color to EXPR      set stroke color (CSS color string)
+--   change pen width to EXPR      set stroke width in pixels
+--
+
+change pen width to 2
+
+function square(size)
+    for i from 1 to 4 do
+        move forward size steps
+        turn right 90 degrees
+    end for
+end function
+
+function star(size, points)
+    my angle is 180 - (180 / points)
+    for i from 1 to points do
+        move forward size steps
+        turn right angle degrees
+    end for
+end function
+
+function spiral(steps)
+    my colors is ["#e74c3c", "#3498db", "#2ecc71", "#f39c12", "#9b59b6"]
+    for i from 1 to steps do
+        my colorIdx is ((i - 1) mod length of colors) + 1
+        change pen color to item colorIdx of colors
+        move forward i * 3 steps
+        turn right 91 degrees
+    end for
+end function
+
+-- Draw a star, then a spiral
+change pen color to "#2c3e50"
+star(100, 5)
+
+-- Move to a new position
+pen up
+move forward 150 steps
+turn right 90 degrees
+move forward 100 steps
+turn left 90 degrees
+pen down
+
+-- Draw the spiral
+change pen width to 1
+spiral(80)

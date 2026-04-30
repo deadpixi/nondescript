@@ -1,0 +1,2 @@
+-- Missing closing paren in expression.
+set x to (1 + 2
